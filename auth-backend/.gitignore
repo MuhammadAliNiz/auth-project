@@ -1,0 +1,492 @@
+############################
+# Spring Boot Application
+############################
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+############################
+# Environment Variables & Secrets
+############################
+
+# Environment files (CRITICAL - Contains sensitive data)
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+.envrc
+
+# Application properties with secrets
+application-secrets.properties
+application-local.properties
+*-secrets.yml
+*-secrets.yaml
+
+# AWS credentials
+.aws/
+aws-credentials.properties
+
+# Key files
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+*.truststore
+secrets/
+keys/
+
+############################
+# IDEs & Editors
+############################
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+.idea_modules/
+*.launch
+.settings/
+.vscode/
+*.sw?
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+.loadpath
+.recommenders
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
+.recommenders
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+.vscode-server/
+*.code-workspace
+.history/
+
+### Sublime Text ###
+*.sublime-workspace
+*.sublime-project
+
+### Vim ###
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+*~
+tags
+[._]*.un~
+
+############################
+# Operating Systems
+############################
+
+### macOS ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+### Windows ###
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+### Linux ###
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+############################
+# Build & Dependencies
+############################
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+############################
+# Logs & Databases
+############################
+
+# Logs
+logs/
+*.log
+*.log.*
+*.log.gz
+log/
+spring.log
+application.log
+
+# H2 Database
+*.db
+*.h2.db
+*.mv.db
+*.trace.db
+
+# Derby
+derby.log
+
+# HSQLDB
+*.lck
+
+############################
+# Testing
+############################
+
+# JUnit
+.junit/
+junit*.properties
+TEST-*.xml
+
+# Code Coverage
+*.gcov
+*.gcda
+*.gcno
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+############################
+# Spring Boot Specific
+############################
+
+# Spring Boot DevTools
+.spring-boot-devtools.properties
+
+# Actuator
+/actuator-exports/
+
+# Spring Boot build info
+**/build-info.properties
+
+############################
+# Security & Certificates
+############################
+
+# SSL Certificates
+*.crt
+*.cer
+*.der
+*.pfx
+*.p7b
+*.p7c
+*.csr
+
+# GPG Keys
+*.gpg
+*.asc
+secring.*
+
+############################
+# Documentation
+############################
+
+# Generated docs
+/docs/_build/
+/site/
+.doctrees
+
+############################
+# Package Files
+############################
+
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# But keep wrapper jars
+!gradle-wrapper.jar
+!maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+############################
+# Temporary Files
+############################
+
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+.#*
+\#*\#
+
+############################
+# Node (if using frontend tools)
+############################
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+.yarn-integrity
+.next
+.nuxt
+dist
+.cache/
+.parcel-cache
+
+############################
+# Docker
+############################
+
+docker-compose.override.yml
+.dockerignore
+
+############################
+# CI/CD
+############################
+
+.jenkins/
+.travis.yml.backup
+.gitlab-ci-local/
+
+############################
+# Cloud Providers
+############################
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.tfvars
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+############################
+# Misc
+############################
+
+# Compiled class files
+*.class
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Backup files
+*.orig
+*.bak
+*.tmp
+*.backup
+
+# Email attachments
+uploads/
+attachments/
+
+# Generated files
+generated/
+generated-sources/
+generated-test-sources/
+
+# ANTLR
+*.tokens
+
+# Eclipse Core
+.project
+.classpath
+
+# JDT-specific (Eclipse Java Development Tools)
+.apt_generated/
+
+# Annotation Processing
+.apt_generated_tests/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+# SBT specific
+.cache
+.history
+.lib/
+dist/*
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Code analysis
+.scannerwork/
+.sonar/
+
+# Profiling
+*.hprof
+*.prof
+
+# JMeter
+jmeter.log
+
+# Application specific folders
+temp/
+tmp/
+cache/
+storage/
+public/storage
+public/hot
+
+# Ignore application-specific uploads
+uploads/
+downloads/
+user-content/
+
+############################
+# Project Specific
+############################
+
+# Email templates (if generated)
+# src/main/resources/templates/generated/
+
+# Custom application logs
+application-*.log
+
+# Backup databases
+*.sql.backup
+*.dump
+
+# Redis dump
+dump.rdb
+
+# Elasticsearch
+elasticsearch/
+
+############################
+# Keep These Files
+############################
+
+# Keep empty directories
+!.gitkeep
+
+# Keep wrapper files
+!gradle/wrapper/gradle-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# Keep example config files
+!.env.example
+!application.properties.example
+!application-example.yml

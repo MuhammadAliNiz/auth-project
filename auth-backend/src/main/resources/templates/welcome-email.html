@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to YourApp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .message {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .features {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .feature-text {
+            flex: 1;
+        }
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 5px;
+        }
+        .feature-description {
+            font-size: 14px;
+            color: #666666;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <div class="emoji">🎉</div>
+        <h1>Welcome to YourApp!</h1>
+    </div>
+    <div class="content">
+        <p class="greeting">Hi <strong th:text="${userName}">User</strong>! 👋</p>
+        <p class="message">
+            We're thrilled to have you on board! Your email has been successfully verified, and your
+            account is now fully activated. You're all set to explore everything YourApp has to offer.
+        </p>
+
+        <div class="features">
+            <div class="feature-item">
+                <div class="feature-icon">🚀</div>
+                <div class="feature-text">
+                    <div class="feature-title">Get Started Quickly</div>
+                    <div class="feature-description">
+                        Jump right in and start exploring our powerful features designed just for you.
+                    </div>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-text">
+                    <div class="feature-title">Secure & Private</div>
+                    <div class="feature-description">
+                        Your data is encrypted and protected with industry-leading security standards.
+                    </div>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">💬</div>
+                <div class="feature-text">
+                    <div class="feature-title">24/7 Support</div>
+                    <div class="feature-description">
+                        Our dedicated support team is always here to help you succeed.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="http://localhost:3000/dashboard" class="cta-button">Go to Dashboard</a>
+        </div>
+
+        <p class="message" style="margin-top: 30px;">
+            If you have any questions or need assistance, don't hesitate to reach out to our support team.
+            We're here to help!
+        </p>
+    </div>
+    <div class="footer">
+        <p>© 2025 YourApp. All rights reserved.</p>
+        <p>
+            <a href="#">Privacy Policy</a> |
+            <a href="#">Terms of Service</a> |
+            <a href="#">Contact Support</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>
