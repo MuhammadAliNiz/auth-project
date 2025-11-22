@@ -1,6 +1,7 @@
 package com.ali.authbackend.security.filter;
 
 import com.ali.authbackend.dto.response.ApiResponse;
+import com.ali.authbackend.dto.response.EmailNotVerifiedResponse;
 import com.ali.authbackend.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -62,7 +63,10 @@ public class EmailVerificationFilter extends OncePerRequestFilter {
 
             response.setStatus(HttpStatus.FORBIDDEN.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            ApiResponse<Void> body = ApiResponse.error(null, "Email is not verified");
+
+            EmailNotVerifiedResponse emailNotVerifiedResponse = new EmailNotVerifiedResponse(userDetails.getEmail(), userDetails.isEmailVerified());
+
+            ApiResponse<EmailNotVerifiedResponse> body = ApiResponse.error(emailNotVerifiedResponse, "Email is not verified");
             response.getWriter().write(objectMapper.writeValueAsString(body));
 
             return;

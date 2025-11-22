@@ -60,7 +60,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(emailVerificationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(emailVerificationFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
