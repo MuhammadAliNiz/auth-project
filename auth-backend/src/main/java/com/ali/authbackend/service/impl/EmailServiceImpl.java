@@ -113,6 +113,34 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+
+    @Async
+    @Override
+    public void sendForgetPasswordEmail(String email, String firstName, String resetToken) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(email);
+            helper.setSubject("Reset Your Password");
+
+            Context context = new Context();
+            context.setVariable("firstName", firstName);
+            context.setVariable("resetToken", resetToken);
+
+            String htmlContent = templateEngine.process("forget-password-email", context);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("Forget password email sent successfully to: {}", email);
+        } catch (MessagingException e) {
+            log.error("Failed to send forget password email to: {}", email, e);
+            throw new RuntimeException("Failed to send forget password email", e);
+        }
+    }
+
+
     private void sendHtmlEmail(String to, String subject, String htmlContent)
             throws MessagingException, UnsupportedEncodingException {
         MimeMessage message = mailSender.createMimeMessage();

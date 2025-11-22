@@ -18,4 +18,6 @@ public interface AuthenticationService {
     void resendVerificationEmail();
 
     AuthResponse login(LoginRequest loginRequest, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse);
+
+    boolean sendForgotPasswordEmail(String email);
 }

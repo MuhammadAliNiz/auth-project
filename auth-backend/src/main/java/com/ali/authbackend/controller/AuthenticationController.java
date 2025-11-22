@@ -1,10 +1,7 @@
 package com.ali.authbackend.controller;
 
 import com.ali.authbackend.annotation.RateLimit;
-import com.ali.authbackend.dto.request.EmailAvailabilityRequest;
-import com.ali.authbackend.dto.request.EmailVerificationRequest;
-import com.ali.authbackend.dto.request.LoginRequest;
-import com.ali.authbackend.dto.request.RegisterRequest;
+import com.ali.authbackend.dto.request.*;
 import com.ali.authbackend.dto.response.ApiResponse;
 import com.ali.authbackend.dto.response.EmailAvailabilityCheckResponse;
 import com.ali.authbackend.dto.response.EmailVerificationResponse;
@@ -29,6 +26,27 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
+    @RateLimit
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<AuthResponse>> login(
+            @Validated @RequestBody LoginRequest loginRequest,
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse
+    ) {
+
+        AuthResponse response = authenticationService.login(
+                loginRequest,
+                httpServletRequest,
+                httpServletResponse
+        );
+
+        ApiResponse<AuthResponse> apiResponse =
+                ApiResponse.success(response, "User logged in successfully");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(apiResponse);
+    }
 
     @RateLimit(capacity = 5, refillTokens = 5, refillMinutes = 1)
     @PostMapping("/email-availability")
@@ -104,27 +122,21 @@ public class AuthenticationController {
 
     }
 
+
     @RateLimit
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(
-            @Validated @RequestBody LoginRequest loginRequest,
-            HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse
-            ) {
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> forgotPassword(
+            @Validated @RequestBody ForgetPasswordRequest request) {
 
-        AuthResponse response = authenticationService.login(
-                loginRequest,
-                httpServletRequest,
-                httpServletResponse
-        );
+        authenticationService.sendForgotPasswordEmail(request.getEmail());
 
-        ApiResponse<AuthResponse> apiResponse =
-                ApiResponse.success(response, "User logged in successfully");
+            return ResponseEntity.ok(
+                    ApiResponse.success(
+                            Map.of("sent", true),
+                            "Password reset email sent successfully"
+                    )
+            );
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(apiResponse);
     }
-
 
 }

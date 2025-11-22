@@ -4,11 +4,13 @@ import com.ali.authbackend.dto.request.EmailVerificationRequest;
 import com.ali.authbackend.dto.request.LoginRequest;
 import com.ali.authbackend.dto.request.RegisterRequest;
 import com.ali.authbackend.dto.response.AuthResponse;
+import com.ali.authbackend.entity.ForgetPassword;
 import com.ali.authbackend.entity.RefreshToken;
 import com.ali.authbackend.entity.User;
 import com.ali.authbackend.entity.enums.RolesEnum;
 import com.ali.authbackend.exception.ResourceAlreadyExistsException;
 import com.ali.authbackend.exception.UserNotFoundException;
+import com.ali.authbackend.repository.ForgetPasswordRepository;
 import com.ali.authbackend.repository.RefreshTokenRepository;
 import com.ali.authbackend.repository.UserRepository;
 import com.ali.authbackend.security.jwt.JwtTokenProvider;
@@ -42,6 +44,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
+
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -50,6 +53,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final SecurityUtils securityUtils;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
+    private final ForgetPasswordRepository forgetPasswordRepository;
+
 
     @Value("${app.jwt.refresh-expiration-ms}")
     private long refreshTokenExpirationMs;
@@ -253,6 +258,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("User {} logged in successfully", user.getEmail());
 
         return response;
+    }
+
+    @Override
+    public boolean sendForgotPasswordEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
+
+        ForgetPassword forgetPassword = new ForgetPassword();
+
+        forgetPassword.setUser(user);
+        forgetPassword.setResetToken(generateVerificationCode());
+        forgetPassword.setExpirationDate(Instant.now().plus(15, ChronoUnit.MINUTES));
+
+        ForgetPassword savedForgetPassword = forgetPasswordRepository.save(forgetPassword);
+
+        emailService.sendForgetPasswordEmail(
+                user.getEmail(),
+                user.getFirstName(),
+                savedForgetPassword.getResetToken()
+        );
+
+
+        return true;
     }
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();

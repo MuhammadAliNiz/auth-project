@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "users", indexes = {
         @Index(name = "idx_user_email", columnList = "email"),
-        @Index(name = "idx_user_created_at", columnList = "createdAt")
+        @Index(name = "idx_user_created_at", columnList = "createdAt"),
+        @Index(name = "idx_user_verification_code", columnList = "emailVerificationCode")
 })
 @NoArgsConstructor
 @AllArgsConstructor

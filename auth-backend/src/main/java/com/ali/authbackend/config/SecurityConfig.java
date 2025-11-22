@@ -42,7 +42,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/api/auth/email-availability"
+                                "/api/auth/email-availability",
+                                "/api/auth/forgot-password"
                         ).permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers(
