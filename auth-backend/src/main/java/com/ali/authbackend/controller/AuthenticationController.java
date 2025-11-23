@@ -1,5 +1,6 @@
 package com.ali.authbackend.controller;
 
+import ch.qos.logback.core.model.Model;
 import com.ali.authbackend.annotation.RateLimit;
 import com.ali.authbackend.dto.request.*;
 import com.ali.authbackend.dto.response.ApiResponse;
@@ -123,20 +124,100 @@ public class AuthenticationController {
     }
 
 
-    @RateLimit
+    @RateLimit(capacity = 3, refillTokens = 3, refillMinutes = 5)
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> forgotPassword(
             @Validated @RequestBody ForgetPasswordRequest request) {
 
-        authenticationService.sendForgotPasswordEmail(request.getEmail());
+        try {
+            authenticationService.sendForgotPasswordEmail(request.getEmail());
+            return ResponseEntity.ok(
+                    ApiResponse.success(
+                            Map.of("sent", true),
+                            "If your email exists, you will receive a password reset link"
+                    )
+            );
+        } catch (Exception e) {
+            log.error("Error in forgot password process for email: {}", request.getEmail(), e.getCause());
 
             return ResponseEntity.ok(
                     ApiResponse.success(
                             Map.of("sent", true),
-                            "Password reset email sent successfully"
+                            "If your email exists, you will receive a password reset link"
                     )
             );
-
+        }
     }
+
+
+    @RateLimit(capacity = 5, refillTokens = 5, refillMinutes = 1)
+    @GetMapping("/validate-reset-token")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> validateResetToken(
+            @RequestParam String token) {
+
+        boolean valid = authenticationService.validateResetToken(token);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        Map.of("valid", valid),
+                        valid ? "Token is valid" : "Token is invalid or expired"
+                )
+        );
+    }
+
+
+    @RateLimit(capacity = 3, refillTokens = 3, refillMinutes = 5)
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> resetPassword(
+            @Validated @RequestBody ResetPasswordRequest request) {
+
+        try {
+            authenticationService.resetPassword(request);
+            return ResponseEntity.ok(
+                    ApiResponse.success(
+                            Map.of("reset", true),
+                            "Password reset successfully"
+                    )
+            );
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(
+                            Map.of("reset", false),
+                            e.getMessage()
+                    ));
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> logout(){
+        authenticationService.logout();
+
+        ApiResponse<Map<String, Boolean>> apiResponse =
+                ApiResponse.success(
+                        Map.of("loggedOut", true),
+                        "User logged out successfully"
+                );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ){
+        AuthResponse response12 = authenticationService.refreshToken(request, response);
+
+        ApiResponse<AuthResponse> apiResponse =
+                ApiResponse.success(response12, "Token refreshed successfully");
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(apiResponse);
+    }
+
 
 }

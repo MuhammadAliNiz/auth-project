@@ -42,8 +42,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
+                                "/api/auth/refresh-token",
                                 "/api/auth/email-availability",
-                                "/api/auth/forgot-password"
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password",
+                                "/api/auth/validate-reset-token",
+                                "/pages/reset-password-page"
                         ).permitAll()
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers(

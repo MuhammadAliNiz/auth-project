@@ -3,11 +3,14 @@ package com.ali.authbackend.service.impl;
 import com.ali.authbackend.dto.request.EmailVerificationRequest;
 import com.ali.authbackend.dto.request.LoginRequest;
 import com.ali.authbackend.dto.request.RegisterRequest;
+import com.ali.authbackend.dto.request.ResetPasswordRequest;
 import com.ali.authbackend.dto.response.AuthResponse;
 import com.ali.authbackend.entity.ForgetPassword;
 import com.ali.authbackend.entity.RefreshToken;
 import com.ali.authbackend.entity.User;
 import com.ali.authbackend.entity.enums.RolesEnum;
+import com.ali.authbackend.exception.InvalidRefreshTokenException;
+import com.ali.authbackend.exception.RefreshTokenNotFoundException;
 import com.ali.authbackend.exception.ResourceAlreadyExistsException;
 import com.ali.authbackend.exception.UserNotFoundException;
 import com.ali.authbackend.repository.ForgetPasswordRepository;
@@ -37,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -261,32 +265,127 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean sendForgotPasswordEmail(String email) {
+    public void sendForgotPasswordEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
 
-        ForgetPassword forgetPassword = new ForgetPassword();
+        //delete forget password row if exists
+        forgetPasswordRepository.findByUserEmail(email)
+                .ifPresent(forgetPasswordRepository::delete);
 
-        forgetPassword.setUser(user);
-        forgetPassword.setResetToken(generateVerificationCode());
-        forgetPassword.setExpirationDate(Instant.now().plus(15, ChronoUnit.MINUTES));
+        String resetToken = UUID.randomUUID().toString();
 
-        ForgetPassword savedForgetPassword = forgetPasswordRepository.save(forgetPassword);
+        ForgetPassword forgetPassword = ForgetPassword.builder()
+                .user(user)
+                .resetToken(resetToken)
+                .used(false)
+                .expirationDate(Instant.now().plus(15, ChronoUnit.MINUTES))
+                .build();
+
+        forgetPasswordRepository.save(forgetPassword);
 
         emailService.sendForgetPasswordEmail(
                 user.getEmail(),
                 user.getFirstName(),
-                savedForgetPassword.getResetToken()
+                resetToken
         );
 
-
-        return true;
+        log.info("Password reset email sent to: {}", email);
     }
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    @Override
+    public boolean validateResetToken(String token) {
+        return forgetPasswordRepository
+                .findByResetTokenAndUsedFalseAndExpirationDateAfter(token, Instant.now())
+                .isPresent();
+    }
+
+    @Transactional
+    @Override
+    public void resetPassword(ResetPasswordRequest request) {
+        ForgetPassword forgetPassword = forgetPasswordRepository
+                .findByResetTokenAndUsedFalseAndExpirationDateAfter(request.getToken(), Instant.now())
+                .orElseThrow(() -> new RuntimeException("Invalid or expired reset token"));
+
+        User user = forgetPassword.getUser();
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        forgetPassword.setUsed(true);
+        forgetPasswordRepository.save(forgetPassword);
+
+        user.revokeAllRefreshTokens();
+
+        log.info("Password reset successfully for user: {}", user.getEmail());
+    }
+
+    @Transactional
+    @Override
+    public AuthResponse refreshToken(
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse) {
+
+        String refreshToken = cookieUtils.extractCookieValue(httpServletRequest, "refresh-token")
+                .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token cookie not found"));
+
+        if (jwtTokenProvider.validateToken(refreshToken)) {
+
+            String jti = jwtTokenProvider.getTokenIdFromToken(refreshToken);
+            String userEmail = jwtTokenProvider.getEmailFromToken(refreshToken);
+
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+            RefreshToken storedRefreshToken = refreshTokenRepository.findByJtiAndUser(jti, user)
+                    .orElseThrow(() -> new RefreshTokenNotFoundException("Refresh token not found"));
+
+            if (storedRefreshToken.isRevoked() || storedRefreshToken.getExpiryDate().isBefore(Instant.now())) {
+                log.info("Refresh token is revoked or expired for user: {}", user.getEmail());
+                throw new InvalidRefreshTokenException("Invalid refresh token");
+            }
+
+            // Update last used time
+            storedRefreshToken.setLastUsedAt(Instant.now());
+            refreshTokenRepository.save(storedRefreshToken);
+
+            String newAccessToken = jwtTokenProvider.generateAccessToken(user);
+
+            AuthResponse response = new AuthResponse();
+
+            response.setUserId(user.getUserId());
+            response.setEmail(user.getEmail());
+            response.setEmailVerified(user.isEmailVerified());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
+            response.setAccessToken(newAccessToken);
+
+            log.info("Access token refreshed successfully for user: {}", user.getEmail());
+
+            return response;
+        }
+        throw  new InvalidRefreshTokenException("Invalid refresh token");
+    }
+
+    @Transactional
+    public void logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserAndRevokedFalse(user);
+        activeTokens.forEach(RefreshToken::revoke);
+        refreshTokenRepository.saveAll(activeTokens);
+
+        log.info("User logged out successfully: {}", email);
+    }
 
     private String generateVerificationCode() {
-        return String.format("%06d", SECURE_RANDOM.nextInt(1000000));
+        SecureRandom secureRandom = new SecureRandom();
+        return String.format("%06d", secureRandom.nextInt(1000000));
     }
 
 

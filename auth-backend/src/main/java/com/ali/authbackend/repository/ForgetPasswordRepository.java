@@ -1,18 +1,19 @@
 package com.ali.authbackend.repository;
 
 import com.ali.authbackend.entity.ForgetPassword;
+import com.ali.authbackend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.Instant;
 import java.util.Optional;
 
 public interface ForgetPasswordRepository extends JpaRepository<ForgetPassword, String> {
-    // Single current token (unique user_id)
+
     Optional<ForgetPassword> findByUserEmail(String email);
 
-    // Active (unused & not expired) token
-    Optional<ForgetPassword> findByUserEmailAndUsedFalseAndExpirationDateAfter(String email, Instant now);
+    Optional<ForgetPassword> findByResetToken(String resetToken);
 
-    // If multiple tokens allowed, newest valid
-    Optional<ForgetPassword> findTopByUserEmailAndUsedFalseAndExpirationDateAfterOrderByCreatedAtDesc(String email, Instant now);
+    Optional<ForgetPassword> findByResetTokenAndUsedFalseAndExpirationDateAfter(String resetToken, Instant now);
+
+    void deleteByUser_Email(String email);
 }
